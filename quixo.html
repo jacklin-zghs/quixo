@@ -420,15 +420,27 @@ function applyMove(dir) {
   selected = null;
   hideArrows();
 
-  const winInfo = checkWin(current);
-  if (winInfo) {
+  // After move: check opponent first, then the player who just moved
+  const opp = current === 1 ? 2 : 1;
+  const oppWin = checkWin(opp);
+  const myWin = checkWin(current);
+
+  if (oppWin) {
+    // The move completed a line for the opponent → opponent wins
     gameOver = true;
     render();
-    highlightWin(winInfo);
+    highlightWin(oppWin);
+    winnerPlate.style.backgroundImage = TILE[opp];
+    winnerOverlay.classList.add('show');
+  } else if (myWin) {
+    // Current player completed their own line → they win
+    gameOver = true;
+    render();
+    highlightWin(myWin);
     winnerPlate.style.backgroundImage = TILE[current];
     winnerOverlay.classList.add('show');
   } else {
-    current = current === 1 ? 2 : 1;
+    current = opp;
     render();
     updateTurn();
   }
